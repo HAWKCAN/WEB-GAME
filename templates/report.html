@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="\static\css\style report.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Gagalin&display=swap" rel="stylesheet">
+
+    <title></title>
+</head>
+<body>  
+    <nav>
+        <div class="back">
+            <div class="header">
+                <div class="logo">
+                    <img src="{{url_for('static' ,filename='images/logo.jpg')}}">
+                        <a href="{{ url_for('home') }}">ZENTRIS PLAY</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="side">
+            <ul>
+                <li><a href="{{ url_for('home') }}"><i class="fa-solid fa-house"></i>HOME</a></li>
+                <li><a href="{{ url_for('action') }}"><i class="fa-solid fa-gun"></i>ACTION</a></li>
+                <li><a href="{{ url_for('puzzle') }}"><i class="fa-solid fa-puzzle-piece"></i>PUZZLE</a></li>
+                <li><a href="{{ url_for('sports') }}"><i class="fas fa-table-tennis"></i>SPORTS</a></li>
+                <li><a href="{{ url_for('report') }}"><i class="fa-solid fa-exclamation"></i>REPORT</a></li>
+            </ul>       
+        </div>
+        <div class="main">
+            <img src="{{ url_for('static', filename='images/fotbar.jpg') }}" alt="">
+            <div class="kata">
+                <p2>
+                    ABOUT US
+                </p2>
+                <br>
+                <p1>
+                    Tim kami menghasilkan game dengan gameplay inovatif yang membuat keta
+                    gihan yang berfokus pada pengalaman bermain yang seru dan santai. Setiap 
+                    permainan dibuat untuk menampilkan petualangan dan keseruan yang tak ter
+                    lupakan, dengan dukungan komunitas yang kuat.
+                </p1>
+                <br>
+                <br>
+                <br>
+                <P3>
+                    The BEST way to predict the future is to Invent it
+                                
+                </P3>
+                <p> ~Alan Kay~ </p>
+            </div>
+        </div>
+    </div>
+    <audio id="myAudio" src="{{ url_for('static', filename='audio/main soundtrack.mp3') }}" autoplay loop></audio>
+
+    <script>
+        window.onload = function() {
+            var audio = document.getElementById("myAudio");
+            audio.muted = false;
+            audio.volume = 0.4;
+        };
+    </script>
+        
+   
+        
+
+</body>
+</html>
+

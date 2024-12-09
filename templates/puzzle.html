@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="\static\css\style puzzle.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title></title>
+</head>
+<body>  
+    <nav>
+        <div class="back">
+            <div class="header">
+                <div class="logo">
+                    <img src="{{url_for('static' ,filename='images/logo.jpg')}}">
+                        <a href="{{ url_for('home') }}">ZENTRIS PLAY</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="side">
+            <ul>
+                <li><a href="{{ url_for('home') }}"><i class="fa-solid fa-house"></i>HOME</a></li>
+                <li><a href="{{ url_for('action') }}"><i class="fa-solid fa-gun"></i>ACTION</a></li>
+                <li><a href="{{ url_for('puzzle') }}"><i class="fa-solid fa-puzzle-piece"></i>PUZZLE</a></li>
+                <li><a href="{{ url_for('sports') }}"><i class="fas fa-table-tennis"></i>SPORTS</a></li>
+                <li><a href="{{ url_for('report') }}"><i class="fa-solid fa-exclamation"></i>REPORT</a></li>
+            </ul>       
+        </div>
+        <canvas id="gameCanvas"></canvas>
+
+        <script>
+            const canvas = document.getElementById("gameCanvas");
+            const ctx = canvas.getContext("2d");
+            const WIDTH = 800;
+            const HEIGHT = 400;
+            canvas.width = WIDTH;
+            canvas.height = HEIGHT;
+
+            const WHITE = "#FFFFFF";
+            const BLACK = "#000000";
+            const GRAY = "#969696";
+            const GREEN = "#228B22";
+
+            const MARGIN = 10; // Jarak antar kartu
+
+            // Konfigurasi level
+            const LEVELS = {
+                1: { rows: 2, cols: 2, scorePerMatch: 10 },
+                2: { rows: 4, cols: 4, scorePerMatch: 20 },
+                3: { rows: 6, cols: 6, scorePerMatch: 30 },
+            };
+
+            let level = 1;
+            let score = 0;
+            let grid = [];
+            let revealed = [];
+            let flippedCards = [];
+            let matchedPairs = 0;
+            let cardSize = 0;
+            let maxPairs = 0;
+
+            const images = [];
+            const CARD_IMAGES = [ 
+                "static/images puzzle/avocado.jpg", "static/images puzzle/blueberry.jpg", 
+                "static/images puzzle/coconut.jpg", "static/images puzzle/orange.jpg",
+                "static/images puzzle/pir.jpg", "static/images puzzle/strawberry.jpg", 
+                "static/images puzzle/manggis.jpg", "static/images puzzle/raspberry.jpg",
+                "static/images puzzle/semangka.jpg", "static/images puzzle/pisang.jpg", 
+                "static/images puzzle/lemon.jpg", "static/images puzzle/apple.jpg",
+                "static/images puzzle/pepaya.jpg", "static/images puzzle/kiwi.jpg", 
+                "static/images puzzle/nanas.jpg", "static/images puzzle/rambutan.jpg",
+                "static/images puzzle/melon.jpg", "static/images puzzle/lychee.jpg", 
+                "static/images puzzle/nipis.jpg", "static/images puzzle/peach.jpg",
+                "static/images puzzle/anggur.jpg", "static/images puzzle/pumpkin.jpg", 
+                "static/images puzzle/cherry.jpg", "static/images puzzle/mangga.jpg",
+                "static/images puzzle/tomato.jpg", "static/images puzzle/berry.jpg", 
+                "static/images puzzle/durian.jpg", "static/images puzzle/delima.jpg"
+            ];
+
+
+            function loadImages() {
+                CARD_IMAGES.forEach((src) => {
+                    const img = new Image();
+                    img.src = src;
+                    images.push(img);
+                });
+            }
+
+            function startLevel(level) {
+                const rows = LEVELS[level].rows;
+                const cols = LEVELS[level].cols;
+                cardSize = Math.min(
+                    Math.floor((WIDTH - 100) / cols - MARGIN),
+                    Math.floor((HEIGHT - 100) / rows - MARGIN)
+                );
+                const totalCards = rows * cols;
+                maxPairs = totalCards / 2;
+
+                const cardImages = images.slice(0, maxPairs).concat(images.slice(0, maxPairs));
+                cardImages.sort(() => Math.random() - 0.5);
+
+                grid = [];
+                revealed = [];
+                for (let r = 0; r < rows; r++) {
+                    grid.push(cardImages.slice(r * cols, (r + 1) * cols));
+                    revealed.push(new Array(cols).fill(false));
+                }
+                matchedPairs = 0;
+                flippedCards = [];
+            }
+
+            function drawCards() {
+                for (let r = 0; r < grid.length; r++) {
+                    for (let c = 0; c < grid[r].length; c++) {
+                        const x = c * (cardSize + MARGIN) +230;
+                        const y = r * (cardSize + MARGIN) + 80;
+                        ctx.fillStyle = revealed[r][c] || flippedCards.some(([fr, fc]) => fr === r && fc === c)
+                            ? WHITE : GRAY;
+                        ctx.fillRect(x, y, cardSize, cardSize);
+                        ctx.strokeStyle = BLACK;
+                        ctx.strokeRect(x, y, cardSize, cardSize);
+                        if (revealed[r][c] || flippedCards.some(([fr, fc]) => fr === r && fc === c)) {
+                            ctx.drawImage(grid[r][c], x, y, cardSize, cardSize);
+                        }
+                    }
+                }
+            }
+
+            function drawUI() {
+                ctx.fillStyle = BLACK;
+                ctx.font = "24px Arial";
+                ctx.fillText(`Score: ${score}`, 10, 30);
+                ctx.fillText(`Level: ${level}`, 10, 60);
+            }
+
+            canvas.addEventListener("click", (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const col = Math.floor((x - 230) / (cardSize + MARGIN));
+                const row = Math.floor((y - 60) / (cardSize + MARGIN));
+
+                if (
+                    row >= 0 && row < grid.length &&
+                    col >= 0 && col < grid[row].length &&
+                    !revealed[row][col] &&
+                    !flippedCards.some(([fr, fc]) => fr === row && fc === col)
+                ) {
+                    flippedCards.push([row, col]);
+                    if (flippedCards.length === 2) {
+                        const [[r1, c1], [r2, c2]] = flippedCards;
+                        if (grid[r1][c1].src === grid[r2][c2].src) {
+                            score += LEVELS[level].scorePerMatch;
+                            revealed[r1][c1] = true;
+                            revealed[r2][c2] = true;
+                            matchedPairs++;
+                        }
+                        setTimeout(() => {
+                            flippedCards = [];
+                            if (matchedPairs === maxPairs) {
+                                if (level < 3) {
+                                    level++;
+                                    startLevel(level);
+                                } else {
+                                    alert(`Game Over! Total Score: ${score}`);
+                                    level = 1;
+                                    score = 0;
+                                    startLevel(level);
+                                }
+                            }
+                        }, 500);
+                    }
+                }
+            });
+
+            function gameLoop() {
+                ctx.clearRect(0, 0, WIDTH, HEIGHT);
+                drawCards();
+                drawUI();
+                requestAnimationFrame(gameLoop);
+            }
+
+            loadImages();
+            startLevel(level);
+            gameLoop();
+        </script>
+    </div>
+        
+    <audio id="myAudio" src="{{ url_for('static', filename='audio/lagu 2 puzzle.mp3') }}" autoplay loop></audio>
+
+    <script>
+        window.onload = function() {
+            var audio = document.getElementById("myAudio");
+            audio.muted = false;
+            audio.volume = 1;
+        };
+    </script>
+     
+   
+        
+
+</body>
+</html>
+

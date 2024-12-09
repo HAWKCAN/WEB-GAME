@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="\static\css\style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title></title>
+</head>
+<body>  
+    <nav>
+        <div class="back">
+            <div class="header">
+                <div class="logo">
+                    <img src="{{url_for('static' ,filename='images/logo.jpg') }}">
+                        <a href="{{ url_for('home') }}">ZENTRIS PLAY</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="side">
+            <ul>
+                <li><a href="{{ url_for('home') }}"><i class="fa-solid fa-house"></i>HOME</a></li>
+                <li><a href="{{ url_for('action') }}"><i class="fa-solid fa-gun"></i>ACTION</a></li>
+                <li><a href="{{ url_for('puzzle') }}"><i class="fa-solid fa-puzzle-piece"></i>PUZZLE</a></li>
+                <li><a href="{{ url_for('sports') }}"><i class="fas fa-table-tennis"></i>SPORTS</a></li>
+                <li><a href="{{ url_for('report') }}"><i class="fa-solid fa-exclamation"></i>REPORT</a></li>
+            </ul>       
+        </div>
+        <div class="main">
+            <div class="img-border">
+                <a href="{{ url_for('action') }}">
+                <img src="{{url_for('static' ,filename='images/sky force image.jpg')}}"> </a>
+            </div>
+            <div class="img-border">
+                <a href="{{ url_for('puzzle') }}">
+                <img src="{{url_for('static' ,filename='images/memoria briliante.jpg')}}"></a>
+            </div>
+            <div class="img-border">
+                <a href="{{ url_for('sports') }}">
+                <img src="{{url_for('static' ,filename='images/table clash.jpg')}}"></a>
+            </div>
+        </div>
+    </div>
+    <audio id="myAudio" src="{{ url_for('static', filename='audio/main soundtrack.mp3') }}" autoplay loop></audio>
+
+    <script>
+        window.onload = function() {
+            var audio = document.getElementById("myAudio");
+            audio.muted = false;
+            audio.volume = 0.4;
+        };
+    </script>
+     
+
+
+
+   
+        
+
+</body>
+</html>
+
